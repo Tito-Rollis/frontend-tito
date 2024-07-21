@@ -11,3 +11,7 @@ export type InputProps = {
     content: string;
     placeholder: string;
 };
+
+export type TextAreaProps = {
+    value: string;
+};

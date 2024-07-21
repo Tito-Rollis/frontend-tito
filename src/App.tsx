@@ -34,18 +34,26 @@ function App() {
                 setBarang(filteredBarang);
             });
         });
+
+        // Reset Index Pelabuhan so it will stay on first Item
+        setIndexPelabuhan(0);
     };
 
     const barangFiltered = (id_pelabuhan: string) => {
         getBarang().then((res) => {
+            // set Index Pelabuhan so it will display the exact value
             setIndexPelabuhan(pelabuhan.findIndex((e) => e.id_pelabuhan === id_pelabuhan.toString()));
 
             // Filter Barang that has the same id_pelabuhan with parameter
             const filteredBarang = res.filter((e) => e.id_pelabuhan.toString() === id_pelabuhan);
             setBarang(filteredBarang);
+
+            // // set Index Barang so it will display the exact value
+            setIndexBarang(filteredBarang.findIndex((e) => e.id_pelabuhan === parseInt(id_pelabuhan)));
         });
     };
-    console.log(indexPelabuhan);
+
+    // Fetch all the data for the first time
     useEffect(() => {
         getNegara().then((resNegara) => {
             setNegara(resNegara);
@@ -61,7 +69,6 @@ function App() {
             });
         });
     }, []);
-
     return (
         <div className=" pt-4  h-screen w-screen bg-slate-800">
             <div className="flex flex-col w-1/3 gap-8 m-auto">
@@ -74,10 +81,10 @@ function App() {
                         title="Nama Negara"
                         handler={pelabuhanFiltered}
                     >
-                        {negara.map((data) => {
+                        {negara.map((data, index) => {
                             return (
                                 <>
-                                    <DropdownMenuRadioItem value={data.id_negara.toString()}>
+                                    <DropdownMenuRadioItem key={index} value={data.id_negara.toString()}>
                                         {data.nama_negara}
                                     </DropdownMenuRadioItem>
                                 </>
@@ -95,10 +102,10 @@ function App() {
                         title="Nama Pelabuhan"
                         handler={barangFiltered}
                     >
-                        {pelabuhan.map((data) => {
+                        {pelabuhan.map((data, index) => {
                             return (
                                 <>
-                                    <DropdownMenuRadioItem value={data.id_pelabuhan.toString()}>
+                                    <DropdownMenuRadioItem key={index} value={data.id_pelabuhan.toString()}>
                                         {data.nama_pelabuhan}
                                     </DropdownMenuRadioItem>
                                 </>
@@ -122,7 +129,7 @@ function App() {
                                 );
                             })}
                         </DropdownComponent>
-                        <TextAreaComponent />
+                        <TextAreaComponent value={barang[indexBarang]?.description} />
                     </div>
                 </div>
 
@@ -131,7 +138,10 @@ function App() {
                     <div className="flex flex-col">
                         <h1 className="text-white">Discount:</h1>
                         <div className="flex items-center gap-1">
-                            <InputComponent content="50" placeholder="Insert discount" />{' '}
+                            <InputComponent
+                                content={barang[indexBarang]?.diskon.toString()}
+                                placeholder="Insert discount"
+                            />{' '}
                             <Percent className="text-white" />
                         </div>
                     </div>
@@ -139,13 +149,24 @@ function App() {
                     {/* Harga */}
                     <div className="flex flex-col">
                         <h1 className="text-white">Harga:</h1>
-                        <InputComponent content="12300" placeholder="Insert Price" />
+                        <InputComponent content={barang[indexBarang]?.harga.toString()} placeholder="Insert Price" />
                     </div>
 
                     {/* Total */}
                     <div className="flex flex-col">
                         <h1 className="text-white">Total:</h1>
-                        <InputComponent content="Rp 1000.000" placeholder="Insert Total" />
+                        <InputComponent
+                            content={(
+                                (barang[indexBarang]?.harga * (100 - barang[indexBarang]?.diskon)) /
+                                100
+                            ).toLocaleString('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                            })}
+                            placeholder="Insert Total"
+                        />
                     </div>
                 </div>
             </div>

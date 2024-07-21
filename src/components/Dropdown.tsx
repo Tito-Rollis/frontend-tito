@@ -14,7 +14,9 @@ import React from 'react';
 export const DropdownComponent = (props: DropdownProps) => {
     const [id, setId] = React.useState('1');
     const idHandler = (value: string) => {
-        props.handler(value);
+        if (props.handler) {
+            props.handler(value);
+        }
         setId(value);
     };
     return (
